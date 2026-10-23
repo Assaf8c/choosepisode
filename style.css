@@ -1,0 +1,274 @@
+/* צבעי מערכת בסגנון Apple — בהיר כברירת מחדל, כהה לפי הגדרת המכשיר */
+:root {
+  --bg: #f2f2f7;
+  --surface: #ffffff;
+  --fill: rgba(120, 120, 128, 0.12);
+  --fill-pressed: rgba(120, 120, 128, 0.2);
+  --label: #000000;
+  --label-2: rgba(60, 60, 67, 0.6);
+  --label-3: rgba(60, 60, 67, 0.3);
+  --separator: rgba(60, 60, 67, 0.18);
+  --accent: #007aff;
+  --accent-tint: rgba(0, 122, 255, 0.12);
+  --danger: #ff3b30;
+  --bar: rgba(242, 242, 247, 0.72);
+  --scrim: rgba(0, 0, 0, 0.32);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
+  --radius: 14px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000;
+    --surface: #1c1c1e;
+    --fill: rgba(118, 118, 128, 0.24);
+    --fill-pressed: rgba(118, 118, 128, 0.36);
+    --label: #ffffff;
+    --label-2: rgba(235, 235, 245, 0.6);
+    --label-3: rgba(235, 235, 245, 0.3);
+    --separator: rgba(84, 84, 88, 0.6);
+    --accent: #0a84ff;
+    --accent-tint: rgba(10, 132, 255, 0.18);
+    --danger: #ff453a;
+    --bar: rgba(0, 0, 0, 0.72);
+    --scrim: rgba(0, 0, 0, 0.5);
+    --shadow: none;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--label);
+  font: 100%/1.45 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+body {
+  min-height: 100dvh;
+  padding: 0 16px calc(32px + env(safe-area-inset-bottom));
+}
+
+button { font: inherit; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+input { font: inherit; font-size: 1rem; } /* 16px לפחות — מונע זום ב-iOS */
+
+/* כותרת עליונה שקופה, התוכן נגלל מתחתיה */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-inline: -16px;
+  padding: calc(14px + env(safe-area-inset-top)) 16px 12px;
+  background: var(--bar);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+@media (min-width: 704px) { .top { max-width: 672px; margin-inline: auto; } }
+
+.top h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+main { max-width: 640px; margin: 8px auto 0; }
+
+/* כפתורים */
+.btn {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 16px;
+  min-height: 36px;
+  background: var(--fill);
+  color: var(--accent);
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 100ms ease-out, background-color 100ms ease-out, opacity 100ms ease-out;
+}
+.btn:active { transform: scale(0.97); background: var(--fill-pressed); }
+.btn.primary { background: var(--accent); color: #fff; font-weight: 600; }
+.btn.primary:active { opacity: 0.8; background: var(--accent); }
+.btn.ghost { background: transparent; padding: 8px 10px; }
+.btn.ghost:active { background: var(--fill); }
+.btn.danger { color: var(--danger); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn:focus-visible, .chip:focus-visible { outline: 3px solid var(--accent-tint); outline-offset: 2px; }
+
+.empty {
+  margin-top: 64px;
+  text-align: center;
+  color: var(--label-2);
+  line-height: 1.6;
+}
+.empty p:first-child { color: var(--label); font-size: 1.25rem; font-weight: 600; margin-bottom: 4px; }
+
+/* כרטיסי סדרות */
+.list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+.card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.card-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+.card-meta { margin: -6px 0 0; color: var(--label-2); font-size: 0.9375rem; }
+.card-last { margin: 0; color: var(--label-2); font-size: 0.8125rem; }
+
+.history {
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--separator);
+}
+.chips { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  direction: ltr;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--fill);
+  color: var(--label-2);
+}
+.chip:first-child { background: var(--accent-tint); color: var(--accent); }
+
+.card-actions {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  padding-top: 10px;
+  border-top: 0.5px solid var(--separator);
+}
+.card-actions .draw { margin-inline-start: auto; }
+
+/* דיאלוגים */
+dialog {
+  width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  border: 0;
+  border-radius: 20px;
+  padding: 20px;
+  background: var(--surface);
+  color: var(--label);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+dialog::backdrop { background: var(--scrim); }
+dialog[open] { animation: sheet-in 320ms var(--ease-out); }
+dialog[open]::backdrop { animation: fade-in 240ms ease-out; }
+@keyframes sheet-in { from { opacity: 0; transform: scale(0.96) translateY(8px); } }
+@keyframes fade-in { from { opacity: 0; } }
+
+dialog h2 { margin: 0 0 18px; font-size: 1.375rem; font-weight: 700; letter-spacing: -0.015em; }
+
+.field { display: grid; gap: 6px; margin-bottom: 14px; }
+.field span { color: var(--label-2); font-size: 0.8125rem; font-weight: 500; }
+.field input {
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 0;
+  background: var(--fill);
+  color: var(--label);
+  transition: box-shadow 100ms ease-out;
+}
+.field input::placeholder { color: var(--label-3); }
+.field input:focus { outline: none; box-shadow: 0 0 0 3px var(--accent-tint), inset 0 0 0 1px var(--accent); }
+
+.same-row { display: flex; gap: 8px; align-items: end; }
+.same-row .grow { flex: 1; }
+.same-row .btn { margin-bottom: 14px; min-height: 42px; }
+
+fieldset { border: 0; border-top: 0.5px solid var(--separator); padding: 14px 0 0; margin: 0 0 14px; }
+legend { color: var(--label-2); font-size: 0.8125rem; font-weight: 500; padding: 0 0 8px; float: right; width: 100%; }
+
+.seasons-grid {
+  clear: both;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 8px;
+}
+.seasons-grid .field { margin: 0; }
+.seasons-grid input { text-align: center; padding: 9px; }
+
+.error { color: var(--danger); font-size: 0.9375rem; margin: 0 0 12px; }
+
+.actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* תוצאת הגרלה */
+.result { text-align: center; }
+.result-series {
+  margin: 4px 0 18px;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--label-2);
+  overflow-wrap: anywhere;
+}
+.result-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.result-cell {
+  background: var(--bg);
+  border-radius: 16px;
+  padding: 18px 8px 14px;
+  display: grid;
+  gap: 2px;
+}
+.result-cell .label { color: var(--label-2); font-size: 0.8125rem; font-weight: 500; }
+.result-cell .num {
+  font-size: 3.75rem;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--label);
+}
+.result-code {
+  margin: 0 0 20px;
+  color: var(--label-2);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+  letter-spacing: 0.04em;
+}
+.result .actions { justify-content: center; }
+.result .actions .btn { flex: 1; min-height: 44px; }
+
+.rolling .num { color: var(--label-3); }
+.landed .num { animation: land 360ms var(--ease-out); }
+@keyframes land { from { opacity: 0.4; transform: scale(0.92); } }
+
+@media (prefers-reduced-motion: reduce) {
+  dialog[open], dialog[open]::backdrop, .landed .num { animation: none; }
+  .btn:active { transform: none; }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .top { background: var(--bg); backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+
+@media (prefers-contrast: more) {
+  .card, dialog { outline: 1px solid var(--label-3); }
+  .field input { box-shadow: inset 0 0 0 1px var(--label-3); }
+}
