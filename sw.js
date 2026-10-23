@@ -1,5 +1,5 @@
 // להעלות את הגרסה בכל שינוי בקבצים כדי לרענן את המטמון
-const CACHE = 'choosepisode-v4';
+const CACHE = 'choosepisode-v5';
 const ASSETS = [
   './',
   'index.html',
@@ -12,7 +12,12 @@ const ASSETS = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache: 'reload' עוקף את מטמון הדפדפן, כדי לא לשמור גרסה ישנה של קובץ
+  e.waitUntil(
+    caches.open(CACHE)
+      .then((c) => c.addAll(ASSETS.map((url) => new Request(url, { cache: 'reload' }))))
+      .then(() => self.skipWaiting()),
+  );
 });
 
 self.addEventListener('activate', (e) => {
@@ -23,10 +28,19 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// קודם מהמטמון (עובד גם בלי אינטרנט), ואם אין — מהרשת
+// קודם מהרשת (תמיד הגרסה העדכנית), ובלי אינטרנט — מהמטמון
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
+  const { request } = e;
+  if (request.method !== 'GET' || new URL(request.url).origin !== location.origin) return;
   e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then((hit) => hit || fetch(e.request)),
+    fetch(request, { cache: 'no-cache' })
+      .then((res) => {
+        if (res.ok) {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(request, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(request, { ignoreSearch: true })),
   );
 });
