@@ -304,8 +304,196 @@ resultDialog.addEventListener('close', () => {
   resultBox.classList.remove('rolling');
 });
 
+// ---------- שיתוף ----------
+// הרשימה נארזת כולה בתוך הקישור (אחרי #), כך שלא צריך שרת ושום מידע לא נשלח אליו
+
+const SHARE_KEY = 'share=';
+
+function toBase64Url(bytes) {
+  let bin = '';
+  for (const b of bytes) bin += String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function fromBase64Url(str) {
+  const bin = atob(str.replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from(bin, (c) => c.charCodeAt(0));
+}
+
+async function pipeBytes(bytes, stream) {
+  const res = new Response(new Blob([bytes]).stream().pipeThrough(stream));
+  return new Uint8Array(await res.arrayBuffer());
+}
+
+// 'z' = דחוס (קישור קצר יותר), 'j' = JSON רגיל לדפדפנים ישנים
+async function encodeList(items) {
+  const bytes = new TextEncoder().encode(JSON.stringify(items.map((s) => [s.name, s.seasons])));
+  if ('CompressionStream' in window) {
+    return 'z' + toBase64Url(await pipeBytes(bytes, new CompressionStream('deflate-raw')));
+  }
+  return 'j' + toBase64Url(bytes);
+}
+
+async function decodeList(code) {
+  let bytes = fromBase64Url(code.slice(1));
+  if (code[0] === 'z') bytes = await pipeBytes(bytes, new DecompressionStream('deflate-raw'));
+  else if (code[0] !== 'j') throw new Error('unknown format');
+  const data = JSON.parse(new TextDecoder().decode(bytes));
+  if (!Array.isArray(data)) throw new Error('bad data');
+
+  // לא סומכים על תוכן הקישור — מקבלים רק סדרות תקינות
+  return data.slice(0, 200).flatMap((item) => {
+    if (!Array.isArray(item)) return [];
+    const [name, seasons] = item;
+    if (typeof name !== 'string' || !name.trim() || !Array.isArray(seasons)) return [];
+    if (!seasons.length || seasons.length > 60) return [];
+    if (!seasons.every((n) => Number.isInteger(n) && n >= 1 && n <= 999)) return [];
+    return [{ name: name.trim().slice(0, 80), seasons }];
+  });
+}
+
+// מוציא את הקוד מקישור מלא או מהקוד עצמו
+function extractCode(text) {
+  const i = text.indexOf(SHARE_KEY);
+  return (i >= 0 ? text.slice(i + SHARE_KEY.length) : text).trim().split(/[&\s]/)[0];
+}
+
+const shareDialog = document.getElementById('shareDialog');
+const shareOut = document.getElementById('shareOut');
+const shareEmpty = document.getElementById('shareEmpty');
+const shareLink = document.getElementById('shareLink');
+const shareStatus = document.getElementById('shareStatus');
+const nativeShareBtn = document.getElementById('nativeShareBtn');
+const pasteInput = document.getElementById('pasteInput');
+const pasteError = document.getElementById('pasteError');
+
+async function openShare() {
+  const empty = series.length === 0;
+  shareOut.hidden = empty;
+  shareEmpty.hidden = !empty;
+  shareStatus.textContent = '';
+  pasteInput.value = '';
+  pasteError.hidden = true;
+  nativeShareBtn.hidden = !navigator.share;
+  if (!empty) {
+    const url = new URL(location.href);
+    url.search = '';
+    url.hash = SHARE_KEY + await encodeList(series);
+    shareLink.value = url.href;
+  }
+  shareDialog.showModal();
+}
+
+document.getElementById('shareBtn').addEventListener('click', openShare);
+document.getElementById('closeShareBtn').addEventListener('click', () => shareDialog.close());
+
+document.getElementById('copyLinkBtn').addEventListener('click', async () => {
+  try {
+    await navigator.clipboard.writeText(shareLink.value);
+    shareStatus.textContent = 'הקישור הועתק ✓';
+  } catch {
+    shareLink.select();
+    shareStatus.textContent = 'סמנו את הקישור והעתיקו אותו.';
+  }
+});
+
+nativeShareBtn.addEventListener('click', async () => {
+  try {
+    await navigator.share({
+      title: 'איזה פרק?',
+      text: `הסדרות שלי (${series.length}) — הוסיפו אותן לרשימה שלכם:`,
+      url: shareLink.value,
+    });
+  } catch {
+    // המשתמש ביטל את השיתוף
+  }
+});
+
+document.getElementById('pasteImportBtn').addEventListener('click', async () => {
+  const code = extractCode(pasteInput.value);
+  if (!code) { pasteInput.focus(); return; }
+  if (await openImport(code)) shareDialog.close();
+  else {
+    pasteError.textContent = 'הקישור לא תקין. בדקו שהעתקתם אותו במלואו.';
+    pasteError.hidden = false;
+  }
+});
+
+// ---------- ייבוא ----------
+
+const importDialog = document.getElementById('importDialog');
+const importList = document.getElementById('importList');
+const confirmImportBtn = document.getElementById('confirmImportBtn');
+let incoming = [];
+
+const sameName = (a, b) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+async function openImport(code) {
+  try {
+    incoming = await decodeList(code);
+  } catch {
+    incoming = [];
+  }
+  if (!incoming.length) return false;
+
+  importList.replaceChildren(...incoming.map((s, i) => {
+    const exists = series.some((x) => sameName(x.name, s.name));
+    const li = document.createElement('li');
+    const label = document.createElement('label');
+    label.className = 'import-row' + (exists ? ' exists' : '');
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.value = i;
+    box.checked = !exists;
+    box.disabled = exists;
+    const text = document.createElement('span');
+    text.className = 'import-text';
+    const name = document.createElement('strong');
+    name.textContent = s.name;
+    const meta = document.createElement('small');
+    const seasonsWord = s.seasons.length === 1 ? 'עונה אחת' : `${s.seasons.length} עונות`;
+    meta.textContent = exists ? 'כבר ברשימה שלך' : `${seasonsWord} · ${s.seasons.reduce((a, b) => a + b, 0)} פרקים`;
+    text.append(name, meta);
+    label.append(box, text);
+    li.append(label);
+    return li;
+  }));
+  updateImportButton();
+  importDialog.showModal();
+  return true;
+}
+
+function updateImportButton() {
+  const n = importList.querySelectorAll('input:checked').length;
+  confirmImportBtn.textContent = n ? `הוספה (${n})` : 'הוספה';
+  confirmImportBtn.disabled = n === 0;
+}
+
+importList.addEventListener('change', updateImportButton);
+document.getElementById('cancelImportBtn').addEventListener('click', () => importDialog.close());
+
+confirmImportBtn.addEventListener('click', () => {
+  const picked = [...importList.querySelectorAll('input:checked')].map((b) => incoming[b.value]);
+  const added = picked
+    .filter((s) => !series.some((x) => sameName(x.name, s.name)))
+    .map((s) => ({ id: crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`, name: s.name, seasons: s.seasons, history: [] }));
+  series = [...added, ...series];
+  saveSeries();
+  render();
+  importDialog.close();
+});
+
+// קישור שיתוף שנפתח באפליקציה
+async function checkSharedLink() {
+  const hash = decodeURIComponent(location.hash.slice(1));
+  if (!hash.startsWith(SHARE_KEY)) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  if (!(await openImport(hash.slice(SHARE_KEY.length)))) alert('קישור השיתוף לא תקין.');
+}
+window.addEventListener('hashchange', checkSharedLink);
+
 // סגירת דיאלוג בלחיצה על הרקע
-for (const d of [formDialog, resultDialog]) {
+for (const d of [formDialog, resultDialog, shareDialog, importDialog]) {
   d.addEventListener('click', (e) => {
     if (e.target !== d) return;
     const r = d.getBoundingClientRect();
@@ -315,6 +503,7 @@ for (const d of [formDialog, resultDialog]) {
 }
 
 render();
+checkSharedLink();
 
 // ---------- PWA ----------
 

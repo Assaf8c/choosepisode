@@ -17,7 +17,10 @@
 <body>
   <header class="top">
     <h1>🎲 איזה פרק?</h1>
-    <button id="addBtn" class="btn primary">+ סדרה</button>
+    <div class="top-actions">
+      <button id="shareBtn" class="btn">שיתוף</button>
+      <button id="addBtn" class="btn primary">+ סדרה</button>
+    </div>
   </header>
 
   <main>
@@ -27,6 +30,46 @@
     </section>
     <ul id="list" class="list"></ul>
   </main>
+
+  <!-- שיתוף הרשימה -->
+  <dialog id="shareDialog">
+    <h2>שיתוף הרשימה</h2>
+    <div id="shareOut">
+      <p class="hint">חברים שיפתחו את הקישור יוכלו להוסיף את הסדרות שלך לרשימה שלהם. ההיסטוריה לא נשלחת.</p>
+      <input id="shareLink" class="link-box" type="text" readonly dir="ltr" aria-label="קישור לשיתוף">
+      <div class="actions">
+        <button type="button" id="copyLinkBtn" class="btn">העתקת קישור</button>
+        <button type="button" id="nativeShareBtn" class="btn primary" hidden>שליחה לחברים</button>
+      </div>
+      <p id="shareStatus" class="status" role="status"></p>
+    </div>
+    <p id="shareEmpty" class="hint" hidden>אין עדיין סדרות לשתף. הוסיפו סדרה ונסו שוב.</p>
+
+    <div class="divider"></div>
+
+    <h3>קיבלתם קישור מחבר?</h3>
+    <p class="hint">אפשר להדביק אותו כאן. שימושי במיוחד אם האפליקציה מותקנת על מסך הבית.</p>
+    <div class="paste-row">
+      <input id="pasteInput" type="text" dir="ltr" placeholder="הדביקו קישור" autocomplete="off">
+      <button type="button" id="pasteImportBtn" class="btn">ייבוא</button>
+    </div>
+    <p id="pasteError" class="error" hidden></p>
+
+    <div class="actions">
+      <button type="button" id="closeShareBtn" class="btn">סגירה</button>
+    </div>
+  </dialog>
+
+  <!-- ייבוא רשימה ששותפה -->
+  <dialog id="importDialog">
+    <h2>רשימה ששותפה איתך</h2>
+    <p class="hint">בחרו אילו סדרות להוסיף לרשימה שלכם.</p>
+    <ul id="importList" class="import-list"></ul>
+    <div class="actions">
+      <button type="button" id="cancelImportBtn" class="btn">ביטול</button>
+      <button type="button" id="confirmImportBtn" class="btn primary">הוספה</button>
+    </div>
+  </dialog>
 
   <!-- טופס הוספה / עריכה -->
   <dialog id="formDialog">

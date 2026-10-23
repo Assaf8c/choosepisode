@@ -75,6 +75,8 @@ input { font: inherit; font-size: 1rem; } /* 16px לפחות — מונע זום
   letter-spacing: -0.02em;
 }
 
+.top-actions { display: flex; gap: 8px; }
+
 main { max-width: 640px; margin: 8px auto 0; }
 
 /* כפתורים */
@@ -219,6 +221,45 @@ legend { color: var(--label-2); font-size: 0.8125rem; font-weight: 500; padding:
 .error { color: var(--danger); font-size: 0.9375rem; margin: 0 0 12px; }
 
 .actions { display: flex; gap: 8px; justify-content: flex-end; }
+
+/* שיתוף וייבוא */
+dialog h3 { margin: 0 0 4px; font-size: 1.0625rem; font-weight: 600; }
+.hint { margin: 0 0 12px; color: var(--label-2); font-size: 0.9375rem; }
+.status { margin: 8px 0 0; min-height: 1.4em; color: var(--mint-ink); font-size: 0.9375rem; text-align: start; }
+.divider { height: 0.5px; background: var(--separator); margin: 16px 0; }
+
+.link-box, .paste-row input {
+  width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--fill);
+  color: var(--label-2);
+  font-size: 0.875rem;
+  text-overflow: ellipsis;
+}
+.paste-row { display: flex; gap: 8px; align-items: start; }
+.paste-row input { flex: 1; min-width: 0; font-size: 1rem; color: var(--label); }
+.paste-row .btn { min-height: 42px; }
+.link-box:focus, .paste-row input:focus { outline: none; box-shadow: 0 0 0 3px var(--accent-tint), inset 0 0 0 1px var(--accent); }
+
+.import-list {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  max-height: 50dvh;
+  overflow-y: auto;
+  border-radius: 12px;
+  background: var(--bg);
+}
+.import-list li + li { border-top: 0.5px solid var(--separator); }
+.import-row { display: flex; gap: 12px; align-items: center; padding: 12px 14px; cursor: pointer; }
+.import-row input { width: 22px; height: 22px; margin: 0; accent-color: var(--accent); flex: none; }
+.import-text { display: grid; gap: 1px; min-width: 0; }
+.import-text strong { font-weight: 600; overflow-wrap: anywhere; }
+.import-text small { color: var(--label-2); font-size: 0.8125rem; }
+.import-row.exists { cursor: default; opacity: 0.55; }
 
 /* תוצאת הגרלה */
 .result { text-align: center; }
