@@ -1,48 +1,40 @@
-/* צבעי מערכת בסגנון Apple — בהיר כברירת מחדל, כהה לפי הגדרת המכשיר */
+/* פלטה בהירה ושמחה — רקע שמנת חמים, כתום-אלמוג להדגשה וטעמי פסטל */
 :root {
-  --bg: #f2f2f7;
+  --bg: #fff8ef;
+  --page: linear-gradient(160deg, #fff4e0 0%, #ffeef4 45%, #eaf6ff 100%);
   --surface: #ffffff;
-  --fill: rgba(120, 120, 128, 0.12);
-  --fill-pressed: rgba(120, 120, 128, 0.2);
-  --label: #000000;
-  --label-2: rgba(60, 60, 67, 0.6);
-  --label-3: rgba(60, 60, 67, 0.3);
-  --separator: rgba(60, 60, 67, 0.18);
-  --accent: #007aff;
-  --accent-tint: rgba(0, 122, 255, 0.12);
-  --danger: #ff3b30;
-  --bar: rgba(242, 242, 247, 0.72);
-  --scrim: rgba(0, 0, 0, 0.32);
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06);
-  --radius: 14px;
+  --fill: rgba(255, 122, 69, 0.1);
+  --fill-pressed: rgba(255, 122, 69, 0.18);
+  --label: #2b2140;
+  --label-2: rgba(43, 33, 64, 0.6);
+  --label-3: rgba(43, 33, 64, 0.3);
+  --separator: rgba(43, 33, 64, 0.1);
+  --accent: #ff6a3d;
+  --accent-2: #ff4f8b;
+  --accent-text: #e2531f;
+  --accent-tint: rgba(255, 106, 61, 0.16);
+  --danger: #e5383b;
+  --bar: rgba(255, 246, 236, 0.75);
+  --scrim: rgba(43, 33, 64, 0.28);
+  --shadow: 0 1px 2px rgba(255, 106, 61, 0.06), 0 10px 28px rgba(255, 106, 61, 0.1);
+  --radius: 18px;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-  color-scheme: light dark;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #000000;
-    --surface: #1c1c1e;
-    --fill: rgba(118, 118, 128, 0.24);
-    --fill-pressed: rgba(118, 118, 128, 0.36);
-    --label: #ffffff;
-    --label-2: rgba(235, 235, 245, 0.6);
-    --label-3: rgba(235, 235, 245, 0.3);
-    --separator: rgba(84, 84, 88, 0.6);
-    --accent: #0a84ff;
-    --accent-tint: rgba(10, 132, 255, 0.18);
-    --danger: #ff453a;
-    --bar: rgba(0, 0, 0, 0.72);
-    --scrim: rgba(0, 0, 0, 0.5);
-    --shadow: none;
-  }
+  /* צבעי התגיות בהיסטוריה */
+  --sun: #fff1c2;   --sun-ink: #a86a00;
+  --mint: #d6f5e6;  --mint-ink: #1d8a57;
+  --sky: #dbeeff;   --sky-ink: #1f6fc4;
+  --lilac: #ece3ff; --lilac-ink: #6b4bc9;
+  --peach: #ffe2d6; --peach-ink: #c4532a;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
 
+html { background: var(--bg) var(--page) fixed; }
+
 html, body {
   margin: 0;
-  background: var(--bg);
   color: var(--label);
   font: 100%/1.45 -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -92,14 +84,19 @@ main { max-width: 640px; margin: 8px auto 0; }
   padding: 8px 16px;
   min-height: 36px;
   background: var(--fill);
-  color: var(--accent);
+  color: var(--accent-text);
   font-weight: 500;
   cursor: pointer;
   transition: transform 100ms ease-out, background-color 100ms ease-out, opacity 100ms ease-out;
 }
 .btn:active { transform: scale(0.97); background: var(--fill-pressed); }
-.btn.primary { background: var(--accent); color: #fff; font-weight: 600; }
-.btn.primary:active { opacity: 0.8; background: var(--accent); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 4px 14px rgba(255, 90, 90, 0.3);
+}
+.btn.primary:active { opacity: 0.85; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
 .btn.ghost { background: transparent; padding: 8px 10px; }
 .btn.ghost:active { background: var(--fill); }
 .btn.danger { color: var(--danger); }
@@ -154,7 +151,12 @@ main { max-width: 640px; margin: 8px auto 0; }
   background: var(--fill);
   color: var(--label-2);
 }
-.chip:first-child { background: var(--accent-tint); color: var(--accent); }
+.chip:nth-child(5n + 1) { background: var(--peach); color: var(--peach-ink); }
+.chip:nth-child(5n + 2) { background: var(--sun); color: var(--sun-ink); }
+.chip:nth-child(5n + 3) { background: var(--mint); color: var(--mint-ink); }
+.chip:nth-child(5n + 4) { background: var(--sky); color: var(--sky-ink); }
+.chip:nth-child(5n + 5) { background: var(--lilac); color: var(--lilac-ink); }
+.chip:first-child { font-weight: 700; box-shadow: inset 0 0 0 1.5px currentColor; }
 
 .card-actions {
   display: flex;
@@ -174,7 +176,7 @@ dialog {
   padding: 20px;
   background: var(--surface);
   color: var(--label);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 20px 60px rgba(120, 50, 80, 0.22);
 }
 dialog::backdrop { background: var(--scrim); }
 dialog[open] { animation: sheet-in 320ms var(--ease-out); }
@@ -229,7 +231,7 @@ legend { color: var(--label-2); font-size: 0.8125rem; font-weight: 500; padding:
 }
 .result-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
 .result-cell {
-  background: var(--bg);
+  background: var(--sun);
   border-radius: 16px;
   padding: 18px 8px 14px;
   display: grid;
@@ -242,8 +244,10 @@ legend { color: var(--label-2); font-size: 0.8125rem; font-weight: 500; padding:
   line-height: 1.05;
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
-  color: var(--label);
+  color: var(--sun-ink);
 }
+.result-cell + .result-cell { background: #ffe3ee; }
+.result-cell + .result-cell .num { color: #d6336c; }
 .result-code {
   margin: 0 0 20px;
   color: var(--label-2);
@@ -255,7 +259,7 @@ legend { color: var(--label-2); font-size: 0.8125rem; font-weight: 500; padding:
 .result .actions { justify-content: center; }
 .result .actions .btn { flex: 1; min-height: 44px; }
 
-.rolling .num { color: var(--label-3); }
+.rolling .num { opacity: 0.4; }
 .landed .num { animation: land 360ms var(--ease-out); }
 @keyframes land { from { opacity: 0.4; transform: scale(0.92); } }
 

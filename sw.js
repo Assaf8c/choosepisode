@@ -1,5 +1,5 @@
 // להעלות את הגרסה בכל שינוי בקבצים כדי לרענן את המטמון
-const CACHE = 'choosepisode-v3';
+const CACHE = 'choosepisode-v4';
 const ASSETS = [
   './',
   'index.html',
